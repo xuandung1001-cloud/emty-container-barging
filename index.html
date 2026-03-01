@@ -1062,10 +1062,10 @@
                 <div>
                     <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.3); border-radius: 4px; padding: 3px 10px; font-size: 11px; color: var(--primary); letter-spacing: 0.08em; margin-bottom: 0.5rem; font-family: Tahoma, sans-serif;">
                         <span style="width:6px;height:6px;border-radius:50%;background:var(--primary);box-shadow:0 0 8px var(--primary);animation:blink 2s infinite;display:inline-block;"></span>
-                        Emty Container Management - Barging
+                        EMTY CONTAINER MANAGEMENT DEPARTMENT
                     </div>
                     <style>@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}</style>
-                    <h1>NHẬP SÀ LAN - SURVEY - QUẢN LÝ RỖNG</h1>
+                    <h1>EMTY CONTAINER - SURVEY - BARGING/h1>
                     <div class="subtitle"></div>
                 </div>
                 <div style="display: flex; gap: 0.75rem;">
@@ -2287,14 +2287,18 @@
                 weekEnd.setDate(weekStart.getDate() + 7);
                 filteredCargo = filteredCargo.filter(c => {
                     const eta = new Date(c.eta);
-                    return eta >= weekStart && eta <= weekEnd;
+                    const etd = new Date(c.etd);
+                    // Lấy chuyến overlap vào tuần này
+                    return eta <= weekEnd && etd >= weekStart;
                 });
             } else if (viewMode === 'month') {
                 const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-                const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
                 filteredCargo = filteredCargo.filter(c => {
                     const eta = new Date(c.eta);
-                    return eta >= monthStart && eta <= monthEnd;
+                    const etd = new Date(c.etd);
+                    // Lấy những chuyến có ETA hoặc ETD nằm trong tháng, hoặc overlap qua tháng
+                    return eta <= monthEnd && etd >= monthStart;
                 });
             }
 
