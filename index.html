@@ -1065,28 +1065,13 @@
                         EMTY CONTAINER MANAGEMENT DEPARTMENT
                     </div>
                     <style>@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}</style>
-                    <h1>EMTY CONTAINER - SURVEY - BARGING <h1>
+                    <h1>EMTY CONTAINER - INSPECTION - BARGING</h1>
                     <div class="subtitle"></div>
                 </div>
-                <div style="display: flex; gap: 0.75rem;">
-                    <button class="btn-secondary" onclick="importAllData()" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.563rem 1.125rem; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); background: var(--dark-700); color: var(--text); font-family: Tahoma, sans-serif; font-size: 0.813rem;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-                        </svg>
-                        Import Data
-                    </button>
-                    <button class="export-btn" onclick="exportAllData()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-                        </svg>
-                        Export All Data
-                    </button>
                 </div>
-            </div>
         </header>
 
         <!-- Hidden file input for import -->
-        <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="handleImportFile(event)">
 
         <div class="nav-tabs">
             <button class="nav-tab" data-tab="vessels">
@@ -2082,10 +2067,16 @@
             document.getElementById('statValue4').textContent = hoanThanh;
             document.getElementById('statValue4').style.color = 'var(--success)';
             
-            // Hide 5th card
-            document.getElementById('statCard5').style.display = 'none';
+            // Card 5: Tổng TEUs chờ dỡ (chưa có dischargeEnd)
+            const teusChoDo = cargoPlans
+                .filter(c => !c.dischargeEnd && c.unit === 'TEUs')
+                .reduce((sum, c) => sum + c.quantity, 0);
+            document.getElementById('statCard5').style.display = '';
+            document.getElementById('statLabel5').textContent = 'TEUs chờ dỡ';
+            document.getElementById('statValue5').textContent = teusChoDo.toLocaleString();
+            document.getElementById('statValue5').style.color = 'var(--danger)';
             applyStatCardBorders([
-                'var(--primary)', 'var(--accent)', 'var(--warning)', 'var(--success)', null
+                'var(--primary)', 'var(--accent)', 'var(--warning)', 'var(--success)', 'var(--danger)'
             ]);
         }
 
@@ -2276,30 +2267,34 @@
             }
 
             const now = new Date();
+            let fixedMinDate = null, fixedMaxDate = null;
+
             if (viewMode === 'week') {
                 const weekStart = new Date(now);
-                // Get Monday: if Sunday (0), go back 6 days; else go back (day-1) days
                 const dayOfWeek = now.getDay();
                 const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
                 weekStart.setDate(now.getDate() + daysToMonday);
                 weekStart.setHours(0, 0, 0, 0);
                 const weekEnd = new Date(weekStart);
-                weekEnd.setDate(weekStart.getDate() + 7);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                weekEnd.setHours(23, 59, 59, 999);
                 filteredCargo = filteredCargo.filter(c => {
                     const eta = new Date(c.eta);
                     const etd = new Date(c.etd);
-                    // Lấy chuyến overlap vào tuần này
                     return eta <= weekEnd && etd >= weekStart;
                 });
+                fixedMinDate = weekStart;
+                fixedMaxDate = weekEnd;
             } else if (viewMode === 'month') {
-                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-                const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+                const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
                 filteredCargo = filteredCargo.filter(c => {
                     const eta = new Date(c.eta);
                     const etd = new Date(c.etd);
-                    // Lấy những chuyến có ETA hoặc ETD nằm trong tháng, hoặc overlap qua tháng
                     return eta <= monthEnd && etd >= monthStart;
                 });
+                fixedMinDate = monthStart;
+                fixedMaxDate = monthEnd;
             }
 
             if (filteredCargo.length === 0) {
@@ -2314,7 +2309,9 @@
 
             updateGanttStats(filteredCargo);
 
-            const { minDate, maxDate } = getDateRange(filteredCargo);
+            const { minDate, maxDate } = fixedMinDate
+                ? { minDate: fixedMinDate, maxDate: fixedMaxDate }
+                : getDateRange(filteredCargo);
             const dates = generateDateArray(minDate, maxDate);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
