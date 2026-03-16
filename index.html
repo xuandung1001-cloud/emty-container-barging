@@ -832,32 +832,26 @@ async function loadInitialData() {
   const m = new Date().getMonth();
   document.getElementById('rpt-month').selectedIndex = m;
 
-  // Load all data in parallel
+  // Load từng API riêng — lỗi 1 cái không ảnh hưởng cái khác
   toast('Đang tải dữ liệu...');
-  try {
-    const [tariffRes, stockRes, trkRes, sumRes] = await Promise.all([
-      apiGet({ action: 'getTariff' }),
-      apiGet({ action: 'getEmtyStock' }),
-      apiGet({ action: 'getTracking' }),
-      apiGet({ action: 'getSummary' })
-    ]);
-    if (tariffRes.success) {
-      state.tariff = tariffRes.data;
-      console.log('Tariff loaded:', state.tariff.length, 'rows');
-      if (state.tariff.length > 0) console.log('Tariff sample:', JSON.stringify(state.tariff[0]));
-    }
-    if (stockRes.success) {
-      state.stock = stockRes.data;
-      console.log('Stock loaded:', state.stock.length, 'containers');
-      if (state.stock.length > 0) console.log('Stock sample:', JSON.stringify(state.stock[0]));
-    }
-    if (trkRes.success) state.tracking = trkRes.data;
-    if (sumRes.success) state.summary = sumRes.data;
-    toast('Đã tải xong: ' + state.tariff.length + ' tariff · ' + state.stock.length + ' containers', 3000);
-  } catch(e) {
-    toast('Lỗi tải dữ liệu: ' + e.message, 4000);
-    console.error('Load error:', e);
-  }
+
+  try { var tariffRes = await apiGet({ action: 'getTariff' });
+    if (tariffRes && tariffRes.success) { state.tariff = tariffRes.data; console.log('Tariff loaded:', state.tariff.length); }
+  } catch(e) { console.error('Tariff load error:', e); }
+
+  try { var stockRes = await apiGet({ action: 'getEmtyStock' });
+    if (stockRes && stockRes.success) { state.stock = stockRes.data; console.log('Stock loaded:', state.stock.length); }
+  } catch(e) { console.error('Stock load error:', e); }
+
+  try { var trkRes = await apiGet({ action: 'getTracking' });
+    if (trkRes && trkRes.success) { state.tracking = trkRes.data; }
+  } catch(e) { console.error('Tracking load error:', e); }
+
+  try { var sumRes = await apiGet({ action: 'getSummary' });
+    if (sumRes && sumRes.success) { state.summary = sumRes.data; }
+  } catch(e) { console.error('Summary load error:', e); }
+
+  toast('Đã tải: ' + state.tariff.length + ' tariff · ' + state.stock.length + ' containers', 3000);
 
   // Add first estimate row
   addEstRow();
