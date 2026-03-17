@@ -43,7 +43,7 @@
         .container {
             max-width: 1600px;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: 1.5rem 2rem;
             position: relative;
             z-index: 1;
         }
@@ -1053,7 +1053,46 @@
             .controls { flex-direction: column; align-items: stretch; }
             .search-box { max-width: 100%; }
         }
-    </style>
+    
+        /* Shimmer title */
+        @keyframes shimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        .shimmer-title {
+            background: linear-gradient(
+                90deg,
+                #ffffff 0%,
+                #ffffff 35%,
+                #00d4ff 45%,
+                #ffffff 50%,
+                #a0f0ff 55%,
+                #ffffff 65%,
+                #ffffff 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+        /* ── PRINT / PDF ── */
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            body { background: #0a0e1a !important; margin: 0; }
+            header, .nav-tabs, #stats,
+            .no-print,
+            #vesselsModule, #cargoModule, #ganttModule, #surveyModule,
+            .btn, button { display: none !important; }
+            .container { padding: 0.3cm !important; max-width: 100% !important; }
+            #baocaoModule { display: block !important; }
+            #baocaoResult { display: block !important; }
+            #bcInfoBar { display: flex !important; margin-bottom: 0.5cm; }
+            .table-wrapper { box-shadow: none !important; overflow: visible !important; }
+            #bcTonBai table, #bcRaVao table { page-break-inside: avoid !important; }
+            @page { margin: 0.6cm; size: A4 landscape; }
+        }
+        </style>
 </head>
 <body>
     <div class="container">
@@ -1062,14 +1101,13 @@
                 <div>
                     <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.3); border-radius: 4px; padding: 3px 10px; font-size: 11px; color: var(--primary); letter-spacing: 0.08em; margin-bottom: 0.5rem; font-family: Tahoma, sans-serif;">
                         <span style="width:6px;height:6px;border-radius:50%;background:var(--primary);box-shadow:0 0 8px var(--primary);animation:blink 2s infinite;display:inline-block;"></span>
-                        BARGE MANAGEMENT SYSTEM
+                        EMTY CONTAINER MANAGEMENT DEPARTMENT
                     </div>
                     <style>@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}</style>
-                    <h1>NHẬP SÀ LAN - SURVEY - QUẢN LÝ RỖNG</h1>
+                    <h1 class="shimmer-title">EMTY CONTAINER - INSPECTION - BARGING</h1>
                     <div class="subtitle"></div>
                 </div>
-
-            </div>
+                </div>
         </header>
 
         <!-- Hidden file input for import -->
@@ -1100,6 +1138,12 @@
                     <path d="M9 12h6M9 16h6"/>
                 </svg>
                 Báo cáo Survey
+            </button>
+            <button class="nav-tab" data-tab="baocao">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18M7 12l4-4 4 4 5-5"/><circle cx="7" cy="12" r="1.5" fill="currentColor"/><circle cx="11" cy="8" r="1.5" fill="currentColor"/><circle cx="15" cy="12" r="1.5" fill="currentColor"/>
+                </svg>
+                Báo cáo TOS
             </button>
         </div>
 
@@ -1300,7 +1344,105 @@
                 </table>
             </div>
         </div>
-    </div>
+
+        <!-- BAO CAO TOS MODULE -->
+        <div id="baocaoModule" class="module-content">
+
+            <!-- ── FORM THÔNG TIN CA ── -->
+            <div class="no-print">
+            <div style="background:var(--dark-800);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;">
+                <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary);margin-bottom:1rem;font-weight:700;">Thông tin ca trực</div>
+
+                <!-- Row 1: ngày, ca, NV -->
+                <div style="display:grid;grid-template-columns:160px 200px 1fr;gap:1rem;margin-bottom:1rem;">
+                    <div>
+                        <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.08em;">Ngày báo cáo</div>
+                        <input type="date" id="bcNgay" class="form-input" style="width:100%;">
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.08em;">Ca</div>
+                        <select id="bcCa" class="form-input" style="width:100%;">
+                            <option value="Sáng (8h - 20h)">Sáng (8h - 20h)</option>
+                            <option value="Đêm (20h - 8h)">Đêm (20h - 8h)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.08em;">NV báo cáo</div>
+                        <input type="text" id="bcNV" class="form-input" placeholder="Họ tên nhân viên..." style="width:100%;">
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- ── UPLOAD FILES ── -->
+            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:1rem;align-items:end;margin-bottom:1.25rem;">
+                <div>
+                    <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.08em;">File Tồn Bãi (.xlsx)</div>
+                    <label for="fileTonBai" style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 1rem;background:var(--dark-700);border:1px dashed rgba(0,212,255,0.2);border-radius:8px;cursor:pointer;font-size:0.83rem;color:var(--text-dim);transition:all 0.2s;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                        <span id="tonBaiFileName" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Chọn file tồn bãi...</span>
+                    </label>
+                    <input type="file" id="fileTonBai" accept=".xlsx,.xls" style="display:none;" onchange="onFileTonBai(event)">
+                </div>
+                <div>
+                    <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.08em;">File Ra Vào Cổng (.xlsx)</div>
+                    <label for="fileRaVao" style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 1rem;background:var(--dark-700);border:1px dashed rgba(0,212,255,0.2);border-radius:8px;cursor:pointer;font-size:0.83rem;color:var(--text-dim);transition:all 0.2s;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                        <span id="raVaoFileName" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Chọn file ra vào cổng...</span>
+                    </label>
+                    <input type="file" id="fileRaVao" accept=".xlsx,.xls" style="display:none;" onchange="onFileRaVao(event)">
+                </div>
+                <div>
+                    <button class="btn btn-primary" onclick="generateBaoCao()" id="btnGenBaoCao" style="opacity:0.4;pointer-events:none;height:38px;padding:0 1.25rem;white-space:nowrap;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg>
+                        Tạo báo cáo
+                    </button>
+                </div>
+            </div>
+
+            </div><!-- /no-print -->
+
+            <!-- ── KẾT QUẢ ── -->
+            <div id="baocaoResult" style="display:none;">
+                <div style="height:1px;background:var(--border);margin-bottom:1.25rem;"></div>
+
+                <!-- Info bar -->
+                <div id="bcInfoBar" style="display:flex;gap:2rem;flex-wrap:wrap;padding:0.875rem 1.25rem;background:var(--dark-800);border:1px solid var(--border);border-radius:10px;margin-bottom:1.25rem;"></div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;">
+                    <!-- I. Tồn bãi -->
+                    <div class="table-wrapper" style="border-radius:10px;overflow:hidden;">
+                        <div style="padding:0.75rem 1.25rem;background:rgba(0,212,255,0.04);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+                            <span style="font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--primary);">I. Tồn Bãi Theo Tình Trạng</span>
+                            <span id="bcTongTon" style="font-size:0.78rem;color:var(--text-dim);font-family:monospace;"></span>
+                        </div>
+                        <div style="padding:0.75rem 1.25rem;" id="bcTonBai"></div>
+                    </div>
+                    <!-- II. Ra vào cổng -->
+                    <div class="table-wrapper" style="border-radius:10px;overflow:hidden;">
+                        <div style="padding:0.75rem 1.25rem;background:rgba(0,212,255,0.04);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+                            <span style="font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--primary);">II. Ra Vào Cổng</span>
+                            <span id="bcTongRV" style="font-size:0.78rem;color:var(--text-dim);font-family:monospace;"></span>
+                        </div>
+                        <div style="padding:0.75rem 1.25rem;" id="bcRaVao"></div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div style="display:flex;justify-content:flex-end;gap:0.75rem;padding-bottom:1rem;">
+                    <button onclick="bcXuatPDF()" style="padding:0.5rem 1rem;border-radius:6px;border:1px solid rgba(0,212,255,0.3);background:rgba(0,212,255,0.06);color:var(--primary);cursor:pointer;font-size:0.83rem;display:flex;align-items:center;gap:0.4rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        Xuất PDF
+                    </button>
+                    <button class="btn btn-primary" onclick="bcSendMail()" style="background:linear-gradient(135deg,#0078d4,#005a9e);border-color:#0078d4;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        Gửi qua Outlook
+                    </button>
+                    <button onclick="bcReset()" style="padding:0.5rem 1rem;border-radius:6px;border:1px solid var(--border);background:var(--dark-700);color:var(--text-dim);cursor:pointer;font-size:0.83rem;">↩ Reset</button>
+                </div>
+            </div>
+        </div>
 
     <!-- Modals will be added here by JavaScript -->
     <div id="modalsContainer"></div>
@@ -1787,7 +1929,12 @@
                 document.getElementById('surveyModule').classList.add('active');
                 renderSurveyReport();
                 updateSurveyReportStats();
+            } else if (tab === 'baocao') {
+                document.getElementById('baocaoModule').classList.add('active');
             }
+            // Ẩn/hiện stats bar
+            const statsEl = document.getElementById('stats');
+            if (statsEl) statsEl.style.display = (tab === 'baocao') ? 'none' : '';
         }
 
         // Vessel functions
@@ -1829,28 +1976,35 @@
         }
 
         function updateVesselStats() {
-            const total = vessels.length;
-            const active = vessels.filter(v => v.status === 'active').length;
-            const totalCapacity = vessels.reduce((sum, v) => sum + v.capacity, 0);
-            const totalTEUs = vessels.reduce((sum, v) => sum + v.teusCapacity, 0);
+            const total       = vessels.length;
+            const active      = vessels.filter(v => v.status === 'active').length;
+            const inactive    = vessels.filter(v => v.status === 'inactive').length;
+            const maintenance = vessels.filter(v => v.status === 'maintenance').length;
+            const totalTEUs   = vessels.filter(v => v.status === 'active').reduce((sum, v) => sum + (v.teusCapacity || 0), 0);
 
-            document.getElementById('statLabel1').textContent = 'Tổng số sà lan';
+            document.getElementById('statLabel1').textContent = 'Tổng sà lan';
             document.getElementById('statValue1').textContent = total;
             document.getElementById('statValue1').style.color = 'var(--primary)';
+
             document.getElementById('statLabel2').textContent = 'Đang hoạt động';
             document.getElementById('statValue2').textContent = active;
-            document.getElementById('statValue2').style.color = 'var(--danger)';
-            document.getElementById('statLabel3').textContent = 'Tổng trọng tải (tấn)';
-            document.getElementById('statValue3').textContent = totalCapacity.toLocaleString();
-            document.getElementById('statValue3').style.color = 'var(--success)';
-            document.getElementById('statLabel4').textContent = 'Tổng TEUs';
-            document.getElementById('statValue4').textContent = totalTEUs;
-            document.getElementById('statValue4').style.color = 'var(--primary)';
-            // Hide 5th card
-            document.getElementById('statCard5').style.display = 'none';
-            // Apply colored borders
+            document.getElementById('statValue2').style.color = 'var(--success)';
+
+            document.getElementById('statLabel3').textContent = 'Ngừng hoạt động';
+            document.getElementById('statValue3').textContent = inactive;
+            document.getElementById('statValue3').style.color = 'var(--danger)';
+
+            document.getElementById('statLabel4').textContent = 'Bảo trì';
+            document.getElementById('statValue4').textContent = maintenance;
+            document.getElementById('statValue4').style.color = 'var(--warning)';
+
+            document.getElementById('statCard5').style.display = '';
+            document.getElementById('statLabel5').textContent = 'TEUs đang hoạt động';
+            document.getElementById('statValue5').textContent = totalTEUs.toLocaleString();
+            document.getElementById('statValue5').style.color = 'var(--primary)';
+
             applyStatCardBorders([
-                'var(--primary)', 'var(--danger)', 'var(--success)', 'var(--primary)', null
+                'var(--primary)', 'var(--success)', 'var(--danger)', 'var(--warning)', 'var(--primary)'
             ]);
         }
 
@@ -2061,10 +2215,16 @@
             document.getElementById('statValue4').textContent = hoanThanh;
             document.getElementById('statValue4').style.color = 'var(--success)';
             
-            // Hide 5th card
-            document.getElementById('statCard5').style.display = 'none';
+            // Card 5: Tổng TEUs chờ dỡ (chưa có dischargeEnd)
+            const teusChoDo = cargoPlans
+                .filter(c => !c.dischargeEnd && c.unit === 'TEUs')
+                .reduce((sum, c) => sum + c.quantity, 0);
+            document.getElementById('statCard5').style.display = '';
+            document.getElementById('statLabel5').textContent = 'TEUs chờ dỡ';
+            document.getElementById('statValue5').textContent = teusChoDo.toLocaleString();
+            document.getElementById('statValue5').style.color = 'var(--danger)';
             applyStatCardBorders([
-                'var(--primary)', 'var(--accent)', 'var(--warning)', 'var(--success)', null
+                'var(--primary)', 'var(--accent)', 'var(--warning)', 'var(--success)', 'var(--danger)'
             ]);
         }
 
@@ -2255,26 +2415,34 @@
             }
 
             const now = new Date();
+            let fixedMinDate = null, fixedMaxDate = null;
+
             if (viewMode === 'week') {
                 const weekStart = new Date(now);
-                // Get Monday: if Sunday (0), go back 6 days; else go back (day-1) days
                 const dayOfWeek = now.getDay();
                 const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
                 weekStart.setDate(now.getDate() + daysToMonday);
                 weekStart.setHours(0, 0, 0, 0);
                 const weekEnd = new Date(weekStart);
-                weekEnd.setDate(weekStart.getDate() + 7);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                weekEnd.setHours(23, 59, 59, 999);
                 filteredCargo = filteredCargo.filter(c => {
                     const eta = new Date(c.eta);
-                    return eta >= weekStart && eta <= weekEnd;
+                    const etd = new Date(c.etd);
+                    return eta <= weekEnd && etd >= weekStart;
                 });
+                fixedMinDate = weekStart;
+                fixedMaxDate = weekEnd;
             } else if (viewMode === 'month') {
-                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-                const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+                const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
                 filteredCargo = filteredCargo.filter(c => {
                     const eta = new Date(c.eta);
-                    return eta >= monthStart && eta <= monthEnd;
+                    const etd = new Date(c.etd);
+                    return eta <= monthEnd && etd >= monthStart;
                 });
+                fixedMinDate = monthStart;
+                fixedMaxDate = monthEnd;
             }
 
             if (filteredCargo.length === 0) {
@@ -2289,7 +2457,9 @@
 
             updateGanttStats(filteredCargo);
 
-            const { minDate, maxDate } = getDateRange(filteredCargo);
+            const { minDate, maxDate } = fixedMinDate
+                ? { minDate: fixedMinDate, maxDate: fixedMaxDate }
+                : getDateRange(filteredCargo);
             const dates = generateDateArray(minDate, maxDate);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -3374,6 +3544,334 @@
 
             reader.readAsText(file);
         }
+        // ===================================================
+        // BÁO CÁO TOS
+        // ===================================================
+        let bcDataTonBai = null;
+        let bcDataRaVao  = null;
+        let bcSaLanCount = 0;
+
+        // Set default date = today
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            const el = document.getElementById('bcNgay');
+            if (el) el.value = today;
+        });
+
+        function bcAddSaLan() {
+            bcSaLanCount++;
+            const id = bcSaLanCount;
+            const row = document.createElement('div');
+            row.id = `bcsl_${id}`;
+            row.style.cssText = 'display:grid;grid-template-columns:1fr 80px 110px 110px auto;gap:0.5rem;align-items:center;';
+            row.innerHTML = `
+                <input type="text" class="form-input" placeholder="Tên sà lan..." style="font-size:0.83rem;">
+                <input type="number" class="form-input" placeholder="Số cont" min="0" style="font-size:0.83rem;text-align:center;">
+                <input type="time" class="form-input" style="font-size:0.83rem;" title="Giờ bắt đầu">
+                <input type="time" class="form-input" style="font-size:0.83rem;" title="Giờ kết thúc">
+                <button onclick="document.getElementById('bcsl_${id}').remove()" style="padding:0.4rem 0.6rem;border-radius:5px;border:1px solid rgba(255,77,109,0.3);background:rgba(255,77,109,0.06);color:#ff4d6d;cursor:pointer;font-size:0.8rem;">✕</button>
+            `;
+            document.getElementById('bcSaLanList').appendChild(row);
+        }
+
+        function onFileTonBai(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            document.getElementById('tonBaiFileName').textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const wb = XLSX.read(ev.target.result, { type: 'array' });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                bcDataTonBai = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true });
+                checkBcReady();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function onFileRaVao(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            document.getElementById('raVaoFileName').textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const wb = XLSX.read(ev.target.result, { type: 'array' });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                bcDataRaVao = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true });
+                checkBcReady();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function checkBcReady() {
+            const btn = document.getElementById('btnGenBaoCao');
+            if (bcDataTonBai && bcDataRaVao) {
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            }
+        }
+
+        function generateBaoCao() {
+            // === XỬ LÝ TỒN BÃI ===
+            const tonBaiCount = {}, hangCount = {}, kichCoCount = {};
+            let tongTon = 0, chuaSurvey = 0;
+
+            bcDataTonBai.slice(1).forEach(row => {
+                if (!row[6]) return; // Số container
+                const tt   = row[15] || 'N/A';  // Tình trạng
+                const hang = row[1]  || 'N/A';  // Hãng khai thác
+                const kc   = row[7]  || 'N/A';  // Kích cỡ
+                const gc   = String(row[18] || '').toUpperCase();
+
+                tonBaiCount[tt] = (tonBaiCount[tt] || 0) + 1;
+                if (!hangCount[hang]) hangCount[hang] = {};
+                hangCount[hang][kc] = (hangCount[hang][kc] || 0) + 1;
+                tongTon++;
+                if (gc.includes('UNSURVEY')) chuaSurvey++;
+            });
+
+            // === XỬ LÝ RA VÀO CỔNG ===
+            let vao = 0, ra = 0;
+            const phuongAnCount = {};
+            const phuongTienCount = {}; // Truck / Barge
+            const kichCoRV = {};
+
+            bcDataRaVao.slice(1).forEach(row => {
+                if (!row[0]) return;
+                const huong = String(row[19] || '');
+                const pa    = String(row[30] || 'N/A').split(':')[0].trim();
+                const kc    = row[4] || 'N/A';
+                const pt    = String(row[25] || 'N/A'); // Phương tiện col 25
+                if (huong.includes('Vào')) vao++;
+                if (huong.includes('Ra'))  ra++;
+                phuongAnCount[pa] = (phuongAnCount[pa] || 0) + 1;
+                phuongTienCount[pt] = (phuongTienCount[pt] || 0) + 1;
+                kichCoRV[kc] = (kichCoRV[kc] || 0) + 1;
+            });
+
+            // === INFO BAR ===
+            const ngay = document.getElementById('bcNgay').value;
+            const ca   = document.getElementById('bcCa').value;
+            const nv   = document.getElementById('bcNV').value;
+            const ngayStr = ngay ? new Date(ngay).toLocaleDateString('vi-VN') : '—';
+            document.getElementById('bcInfoBar').innerHTML = [
+                { label: 'Ngày báo cáo', value: ngayStr, color: 'var(--primary)' },
+                { label: 'Ca', value: ca, color: 'var(--primary)' },
+                { label: 'NV báo cáo', value: nv || '(chưa điền)', color: nv ? '#fff' : 'var(--text-dim)' },
+            ].map(x => `<div>
+                <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:0.25rem">${x.label}</div>
+                <div style="font-size:0.95rem;font-weight:700;color:${x.color}">${x.value}</div>
+            </div>`).join('');
+
+            // === CẬP NHẬT HEADER TOTALS ===
+            const gradeColor = { A:'#00ff94', B:'#00d4ff', C:'#ffd700', D:'#ff4d6d', U:'#a78bfa', O:'#64748b', 'N/A':'#64748b' };
+            const elTong = document.getElementById('bcTongTon');
+            const elRV   = document.getElementById('bcTongRV');
+            if (elTong) elTong.textContent = tongTon.toLocaleString() + ' cont' + (chuaSurvey ? ` · ⚠ ${chuaSurvey} chưa survey` : '');
+            if (elRV)   elRV.textContent   = `Vào ${vao} · Ra ${ra}`;
+
+            // Lưu để gửi mail
+            window._bcSummary = {
+                ngay: document.getElementById('bcNgay').value,
+                ca: document.getElementById('bcCa').value,
+                nv: document.getElementById('bcNV').value,
+                tongTon, chuaSurvey, vao, ra, tonBaiCount, phuongAnCount, hangCount
+            };
+
+            // === RENDER TỒN BÃI ===
+            const gradeNames = { A:'Tốt', B:'Bình thường', C:'Hư nhẹ', D:'Hư nặng', U:'Chưa xác định', O:'Khác' };
+
+            // Container Status × Tình trạng × Kích cỡ (col56 × col15 × col7)
+            const csCombo = {};
+            bcDataTonBai.slice(1).forEach(row => {
+                if (!row[6]) return;
+                const cs = String(row[56] || '').trim();
+                const tt = String(row[15] || '').trim();
+                const kc = String(row[7]  || '').trim();
+                if (!cs) return;
+                const key = `${tt}|${kc}`;
+                if (!csCombo[cs]) csCombo[cs] = {};
+                csCombo[cs][key] = (csCombo[cs][key] || 0) + 1;
+            });
+            const csKeys = Object.keys(csCombo).sort();
+
+            let tbHtml = '';
+            if (csKeys.length > 0) {
+                tbHtml = `<table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
+                    <thead><tr>
+                        <th style="padding:0.5rem 0.75rem;text-align:left;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border)">Status</th>
+                        <th style="padding:0.5rem 0.75rem;text-align:left;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border)">Tình trạng</th>
+                        <th style="padding:0.5rem 0.75rem;text-align:left;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border)">Kích cỡ</th>
+                        <th style="padding:0.5rem 0.75rem;text-align:right;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border)">Số lượng</th>
+                    </tr></thead><tbody>`;
+
+                csKeys.forEach(cs => {
+                    const entries = Object.entries(csCombo[cs]).sort((a,b)=>b[1]-a[1]);
+                    const csTotal = entries.reduce((s,[,v])=>s+v,0);
+                    entries.forEach(([key, cnt], idx) => {
+                        const [tt, kc] = key.split('|');
+                        const color = gradeColor[tt] || '#64748b';
+                        tbHtml += `<tr>
+                            ${idx===0 ? `<td style="padding:0.55rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.04);font-weight:700;color:var(--text);vertical-align:middle" rowspan="${entries.length}">
+                                ${cs}<div style="font-size:0.72rem;color:var(--text-dim);font-weight:400;font-family:monospace">${csTotal}</div></td>` : ''}
+                            <td style="padding:0.55rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.04)">
+                                <span style="display:inline-block;padding:0.1rem 0.45rem;border-radius:4px;font-size:0.73rem;font-weight:700;background:${color}22;color:${color};font-family:monospace">${tt}</span>
+                                <span style="color:var(--text-dim);font-size:0.78rem;margin-left:0.3rem">${gradeNames[tt]||''}</span>
+                            </td>
+                            <td style="padding:0.55rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.04);font-family:monospace;font-size:0.82rem;color:var(--text-dim)">${kc}</td>
+                            <td style="padding:0.55rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.04);font-family:monospace;font-weight:600;text-align:right">${cnt.toLocaleString()}</td>
+                        </tr>`;
+                    });
+                });
+                tbHtml += `<tr><td colspan="4" style="padding:0.6rem 0.75rem;font-weight:700;color:var(--primary);border-top:1px solid var(--border)">Tổng: ${tongTon.toLocaleString()} containers</td></tr>`;
+                tbHtml += '</tbody></table>';
+            }
+
+            document.getElementById('bcTonBai').innerHTML = tbHtml;
+
+            // === RENDER RA VÀO CỔNG ===
+            const paNames = { NRCK:'Nhập rỗng cảng khác', CRCK:'Chuyển rỗng cảng khác', CRKH:'Cấp rỗng khách hàng', TRAR:'Trả rỗng', CAPR:'Cấp rỗng', GIAO:'Giao hàng' };
+            const paColors = { NRCK:'#00d4ff', CRCK:'#a78bfa', CRKH:'#00ff94', TRAR:'#ffd700', CAPR:'#ff9f43', GIAO:'#ff4d6d' };
+            const ptColors = { Barge:'#00d4ff', Truck:'#ffd700' };
+
+            let rvHtml = `<div style="height:1px;background:var(--border);margin-bottom:0.75rem"></div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div>
+                    <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--primary);margin-bottom:0.5rem;font-weight:700;">Phương án tác nghiệp</div>
+                    <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                        <tbody>`;
+
+            Object.entries(phuongAnCount).sort((a,b)=>b[1]-a[1]).forEach(([k,v]) => {
+                const color = paColors[k] || '#64748b';
+                rvHtml += `<tr>
+                    <td style="padding:0.4rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.04)">
+                        <span style="display:inline-block;padding:0.1rem 0.5rem;border-radius:4px;font-size:0.7rem;font-weight:600;background:${color}22;color:${color};border:1px solid ${color}44">${k}</span>
+                        <span style="color:var(--text-dim);font-size:0.78rem;margin-left:0.3rem">${paNames[k]||''}</span>
+                    </td>
+                    <td style="padding:0.4rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.04);font-family:monospace;font-weight:600;text-align:right">${v}</td>
+                </tr>`;
+            });
+
+            rvHtml += `</tbody></table></div>
+                <div>
+                    <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--primary);margin-bottom:0.5rem;font-weight:700;">Phương tiện</div>
+                    <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                        <tbody>`;
+
+            Object.entries(phuongTienCount).sort((a,b)=>b[1]-a[1]).forEach(([k,v]) => {
+                const color = ptColors[k] || '#64748b';
+                rvHtml += `<tr>
+                    <td style="padding:0.4rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.04)">
+                        <span style="display:inline-block;padding:0.1rem 0.5rem;border-radius:4px;font-size:0.7rem;font-weight:600;background:${color}22;color:${color};border:1px solid ${color}44">${k}</span>
+                    </td>
+                    <td style="padding:0.4rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.04);font-family:monospace;font-weight:600;text-align:right">${v}</td>
+                </tr>`;
+            });
+
+            rvHtml += `</tbody></table></div>
+            </div>`;
+
+            document.getElementById('bcRaVao').innerHTML = rvHtml;
+
+            // Lưu để gửi mail
+            window._bcSummary = { tongTon, chuaSurvey, vao, ra, tonBaiCount, phuongAnCount, hangCount };
+
+            document.getElementById('baocaoResult').style.display = 'block';
+            document.getElementById('baocaoResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function bcXuatPDF() {
+            window.print();
+        }
+
+        function bcSendMail() {
+            const d = window._bcSummary;
+            if (!d) return;
+            const gradeNames = { A:'Tốt', B:'Bình thường', C:'Hư nhẹ', D:'Hư nặng', U:'Chưa xác định', O:'Khác' };
+            const paNames    = { NRCK:'Nhập rỗng cảng khác', CRCK:'Chuyển rỗng cảng khác', CRKH:'Cấp rỗng khách hàng', TRAR:'Trả rỗng', CAPR:'Cấp rỗng' };
+
+            const ngayStr = d.ngay ? new Date(d.ngay).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN');
+            const tonBaiText = Object.entries(d.tonBaiCount).sort((a,b)=>b[1]-a[1])
+                .map(([k,v]) => `    ${k} - ${gradeNames[k]||k}: ${v} cont`).join('\n');
+            const rvText = Object.entries(d.phuongAnCount).sort((a,b)=>b[1]-a[1])
+                .map(([k,v]) => `    ${k} (${paNames[k]||k}): ${v} cont`).join('\n');
+            const hangText = Object.entries(d.hangCount)
+                .map(([h, kc]) => {
+                    const total = Object.values(kc).reduce((s,v)=>s+v,0);
+                    const detail = Object.entries(kc).map(([k,v])=>`${k}: ${v}`).join(', ');
+                    return `    ${h}: ${total} cont (${detail})`;
+                }).join('\n');
+            const saLanText = d.saLans && d.saLans.length > 0
+                ? d.saLans.map(s => `    ${s.stt}. ${s.ten}: ${s.so} cont | ${s.bd||'?'} -> ${s.kt||'?'} (${s.thoiGian||'N/A'})`).join('\n')
+                : '    Khong co du lieu';
+            const tongSaLan = d.saLans ? d.saLans.reduce((s,r)=>s+r.so,0) : 0;
+
+            const subject = encodeURIComponent(`Bao cao ca ${d.ca} ngay ${ngayStr} - Quan Ly Rong`);
+            const body = encodeURIComponent(`BAO CAO CA - QUAN LY RONG
+===================================
+Ngay       : ${ngayStr}
+Ca         : ${d.ca}
+NV bao cao : ${d.nv || '(chua dien)'}
+
+I. TON BAI
+-----------------------------------
+  Tong ton    : ${d.tongTon.toLocaleString()} containers
+  Chua survey : ${d.chuaSurvey} containers
+  Phan theo tinh trang:
+${tonBaiText}
+
+II. RA VAO CONG
+-----------------------------------
+  Nhap vao : ${d.vao} containers
+  Xuat ra  : ${d.ra} containers
+  Tong     : ${d.vao + d.ra} containers
+  Phan theo phuong an:
+${rvText}
+
+III. HANG TAU & KICH CO
+-----------------------------------
+${hangText}
+
+IV. NHAP RONG SA LAN
+-----------------------------------
+  So sa lan : ${d.saLans ? d.saLans.length : 0} | Tong cont: ${tongSaLan}
+${saLanText}
+
+===================================
+Bao cao duoc tao tu dong tu he thong EMTY Container Management.`);
+
+            window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+        }
+
+        function bcReset() {
+            bcDataTonBai = null; bcDataRaVao = null;
+            document.getElementById('fileTonBai').value = '';
+            document.getElementById('fileRaVao').value = '';
+            document.getElementById('tonBaiFileName').textContent = 'Chọn file tồn bãi...';
+            document.getElementById('raVaoFileName').textContent = 'Chọn file ra vào cổng...';
+            document.getElementById('baocaoResult').style.display = 'none';
+            document.getElementById('bcSaLanList').innerHTML = '';
+            document.getElementById('bcNV').value = '';
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('bcNgay').value = today;
+            const btn = document.getElementById('btnGenBaoCao');
+            btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none';
+            window._bcSummary = null;
+            bcSaLanCount = 0;
+        }
+
+        function bcReset() {
+            bcDataTonBai = null; bcDataRaVao = null;
+            document.getElementById('fileTonBai').value = '';
+            document.getElementById('fileRaVao').value = '';
+            document.getElementById('tonBaiFileName').textContent = 'Chọn file tồn bãi...';
+            document.getElementById('raVaoFileName').textContent = 'Chọn file ra vào cổng...';
+            document.getElementById('baocaoResult').style.display = 'none';
+            document.getElementById('btnGenBaoCao').style.opacity = '0.4';
+            document.getElementById('btnGenBaoCao').style.pointerEvents = 'none';
+            window._bcSummary = null;
+        }
+
     </script>
 </body>
 </html>
