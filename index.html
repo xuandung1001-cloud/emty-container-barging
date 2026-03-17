@@ -1067,11 +1067,12 @@
                     <style>@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}</style>
                     <h1>NHẬP SÀ LAN - SURVEY - QUẢN LÝ RỖNG</h1>
                     <div class="subtitle"></div>
+                </div>
+
             </div>
         </header>
 
-        <!-- Hidden file input for import (kept for potential future use) -->
-        <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="handleImportFile(event)">
+        <!-- Hidden file input for import -->
 
         <div class="nav-tabs">
             <button class="nav-tab" data-tab="vessels">
@@ -1363,8 +1364,8 @@
         // ============================================================
         // JSONBIN CONFIG — điền vào sau khi tạo account
         // ============================================================
-        const JSONBIN_API_KEY = 'PASTE_API_KEY_HERE';   // Master Key từ jsonbin.io
-        const JSONBIN_BIN_ID  = 'PASTE_BIN_ID_HERE';    // ID của bin mày tạo
+        const JSONBIN_API_KEY = '$2a$10$E7CdiELXL5H81b1dlRQ4fuqeasI7BF1Stxa2wW89kxMZ0wuWucQze';   // Master Key từ jsonbin.io
+        const JSONBIN_BIN_ID  = '69a2831ed0ea881f40e10786';    // ID của bin mày tạo
         const JSONBIN_URL     = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
         let isSaving = false;
