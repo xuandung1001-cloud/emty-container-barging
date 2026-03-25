@@ -3251,9 +3251,13 @@ async function loadBulk() {
         tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:var(--gray);padding:20px">Không có dữ liệu estimates</td></tr>';
         return;
       }
-      // Chỉ lấy dòng có app data
+      // Chỉ lấy dòng có app data VÀ thuộc job active (không phải Rejected/Repaired)
+      var CLOSED_BULK = ['Rejected', 'Repaired'];
       var data = res.data.filter(function(r) {
-        return r.app_damage_location || r.app_component || r.app_repair_type;
+        if (!(r.app_damage_location || r.app_component || r.app_repair_type)) return false;
+        // Kiểm tra approval_status của dòng này
+        if (CLOSED_BULK.includes(r.approval_status)) return false;
+        return true;
       });
       // Filter theo cont search nếu có
       if (searchList.length > 0) {
@@ -3304,6 +3308,9 @@ async function loadBulk() {
       return;
     }
     var data = res.data;
+    // Lọc bỏ dòng thuộc job Rejected/Repaired
+    var CLOSED_BULK_A = ['Rejected', 'Repaired'];
+    data = data.filter(function(r) { return !CLOSED_BULK_A.includes(r.approval_status); });
     if (searchList.length > 0) {
       data = data.filter(function(r) { return searchList.includes((r.equipment_number||'').toUpperCase().trim()); });
     }
