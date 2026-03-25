@@ -38,12 +38,12 @@ body{font-family:Tahoma,'Segoe UI',sans-serif;background:#F5F5F5;color:#1a202c;f
 .tb-actions{display:flex;gap:8px}
 
 /* BUTTONS */
-.btn{padding:5px 12px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--white);color:#555;cursor:pointer;transition:all .15s;font-family:inherit}
-.btn:hover{background:#F5F5F5}
-.btn-blue{background:var(--amber-accent);border-color:var(--amber-accent);color:#7A5500;font-weight:600}
-.btn-blue:hover{background:#e6b800}
-.btn-red{border-color:#fc8181;color:var(--red)}
-.btn-red:hover{background:var(--red-light)}
+.btn{padding:5px 14px;font-size:12px;border:1px solid #F5EDD0;border-radius:6px;background:#FEFAF0;color:#7A5500;cursor:pointer;transition:all .15s;font-family:inherit;font-weight:500}
+.btn:hover{background:#FDF3D0;border-color:var(--amber-accent)}
+.btn-blue{background:var(--amber-accent);border-color:#D4A800;color:#5A3E00;font-weight:600}
+.btn-blue:hover{background:#e6b800;border-color:#c9a200}
+.btn-red{background:#FEF0F0;border-color:#fc8181;color:var(--red);font-weight:500}
+.btn-red:hover{background:#fee2e2;border-color:var(--red)}
 .btn-sm{padding:4px 10px;font-size:11px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 
@@ -1049,8 +1049,8 @@ td input:focus,td select:focus{background:#FEFAF0}
             <div class="card-title" style="margin:0">MSC Inventory Report — Cảng Thạnh Phước</div>
             <div style="display:flex;gap:8px;align-items:center">
               <div style="font-size:11px;color:var(--gray)" id="inv-info">—</div>
-              <button class="btn btn-sm" onclick="refreshInventory()" style="background:var(--blue)">&#8635; Refresh</button>
-              <button class="btn btn-sm" onclick="exportInventoryExcel()" style="background:#16a34a">&#8595; Export Excel</button>
+              <button class="btn btn-sm" onclick="refreshInventory()">&#8635; Refresh</button>
+              <button class="btn btn-sm btn-blue" onclick="exportInventoryExcel()">&#8595; Export Excel</button>
             </div>
           </div>
           <div style="font-size:11px;color:var(--gray);margin-bottom:10px" id="inv-date"></div>
@@ -2939,7 +2939,7 @@ function renderTrackingTable(data) {
       <td style="text-align:center">${r.po_number||'—'}</td>
       <td>${formatDate(r.po_date)||'—'}</td>
       <td style="padding:2px 4px"><input class="trk-remark-input" value="${(r.remarks1||r.remarks2||'').replace(/"/g,'&quot;')}" placeholder="Ghi chú..." onblur="saveTrackingRemark(this,'${r.container_no}','${r.est_date||''}')" style="width:100%;border:none;border-bottom:1px solid transparent;background:transparent;font-size:11px;color:var(--text);padding:2px 4px;border-radius:3px;outline:none;text-align:left" onfocus="this.style.borderBottomColor='var(--blue)';this.style.background='#fff'" onblur="this.style.borderBottomColor='transparent';this.style.background='transparent';saveTrackingRemark(this,'${r.container_no}','${r.est_date||''}')"></td>
-      <td style="white-space:nowrap;padding:2px 4px;text-align:left"><button onclick="editEstimate('${r.container_no}','${r.est_date}')" style="border:none;background:#FEFAF0;color:#A06010;cursor:pointer;font-size:11px;padding:2px 8px;border-radius:4px;margin-right:2px">Sửa</button><button onclick="deleteEstimate('${r.container_no}','${r.est_date}')" style="border:none;background:#FCEBEB;color:#791F1F;cursor:pointer;font-size:11px;padding:2px 8px;border-radius:4px;margin-right:2px">Xoá</button>${(r.approval_status === 'Partially Approved' || r.approval_status === 'Partially Approved - Revised') ? `<button onclick="goRevise('${r.container_no}','${r.est_date}')" style="border:none;background:#FAEEDA;color:#633806;cursor:pointer;font-size:11px;padding:2px 8px;border-radius:4px">Revise</button>` : ''}</td>
+      <td style="white-space:nowrap;padding:2px 4px;text-align:left"><button onclick="editEstimate('${r.container_no}','${r.est_date}')" class="btn btn-sm" style="margin-right:2px">Sửa</button><button onclick="deleteEstimate('${r.container_no}','${r.est_date}')" class="btn btn-sm btn-red" style="margin-right:2px">Xoá</button>${(r.approval_status === 'Partially Approved' || r.approval_status === 'Partially Approved - Revised') ? `<button onclick="goRevise('${r.container_no}','${r.est_date}')" class="btn btn-sm btn-blue">Revise</button>` : ''}</td>
     </tr>
   `).join('');
 }
